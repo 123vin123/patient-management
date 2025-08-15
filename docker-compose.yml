@@ -1,0 +1,38 @@
+version: '3.9'
+
+services:
+  patient-service-database:
+    image: mysql:latest
+    container_name: patient-service-database
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: patientdb
+    ports:
+      - "3306:3306"   # Host:Container
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-ppassword"]
+      interval: 5s
+      retries: 10
+    networks:
+      - patient-network
+
+  patient-service:  # this should be under 'services', not outside
+    build: ./patient-service
+    container_name: patient-service
+    restart: always
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://patient-service-database:3306/patientdb  # 👈 FIX db name
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: password
+    ports:
+      - "4000:4000"
+    depends_on:
+      patient-service-database:
+        condition: service_healthy
+    networks:
+      - patient-network
+
+networks:
+  patient-network:
+    driver: bridge

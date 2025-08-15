@@ -1,0 +1,8 @@
+CREATE TABLE IF NOT EXISTS patient (
+                                       id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                                       name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    address VARCHAR(255) NOT NULL,
+    date_of_birth DATE NOT NULL,
+    registered_date DATE NOT NULL
+    );
