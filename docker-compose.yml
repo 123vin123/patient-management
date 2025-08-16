@@ -9,7 +9,7 @@ services:
       MYSQL_ROOT_PASSWORD: password
       MYSQL_DATABASE: patientdb
     ports:
-      - "3306:3306"   # Host:Container
+      - "3306:3306"
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-ppassword"]
       interval: 5s
@@ -17,19 +17,34 @@ services:
     networks:
       - patient-network
 
-  patient-service:  # this should be under 'services', not outside
+  patient-service:
     build: ./patient-service
     container_name: patient-service
     restart: always
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://patient-service-database:3306/patientdb  # 👈 FIX db name
+      SPRING_DATASOURCE_URL: jdbc:mysql://patient-service-database:3306/patientdb
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: password
+      BILLING_SERVICE_ADDRESS: billing-service
+      BILLING_SERVICE_GRPC_PORT: 9001
     ports:
       - "4000:4000"
     depends_on:
       patient-service-database:
         condition: service_healthy
+    networks:
+      - patient-network
+
+  billing-service:
+    build: ./billing-service
+    container_name: billing-service
+    restart: always
+    environment:
+      BILLING_SERVICE_ADDRESS: billing-service
+      BILLING_SERVICE_GRPC_PORT: 9001
+    ports:
+      - "4001:4001"   # REST endpoint (if any)
+      - "9001:9001"   # gRPC endpoint
     networks:
       - patient-network
 
