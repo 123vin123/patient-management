@@ -14,7 +14,10 @@ FROM openjdk:21-jdk AS runner
 WORKDIR /app
 
 COPY --from=builder ./app/target/patient-service-0.0.1-SNAPSHOT.jar ./app.jar
+# Enable debug on port 5005
+ENV JAVA_TOOL_OPTIONS="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
+
 
 EXPOSE 4000
-
+EXPOSE 5000
 ENTRYPOINT ["java", "-jar", "app.jar"]
