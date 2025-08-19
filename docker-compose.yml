@@ -16,6 +16,37 @@ services:
       retries: 10
     networks:
       - patient-network
+  auth-service-database:
+    image: mysql:latest
+    container_name: auth-service-database
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: authdb
+    ports:
+      - "3307:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-ppassword"]
+      interval: 5s
+      retries: 10
+    networks:
+      - patient-network
+
+  auth-service:
+    build: ./auth-service
+    restart: always
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://auth-service-database:3306/authdb
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: password
+      JWT_SECRET: IxQm+Ew8bxKzs9TXn8U/sILSfJrUBrngc0E0qXyL8yK8K/2IRK3xrdfV3VlpWg74ymoH5Rovfi5WilAgY/hYvw==
+    depends_on:
+      auth-service-database:
+          condition: service_healthy
+    ports:
+      - "4005:4005"
+    networks:
+      patient-network:
 
   patient-service:
     build: ./patient-service
