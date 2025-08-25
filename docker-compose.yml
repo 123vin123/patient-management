@@ -40,6 +40,7 @@ services:
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: password
       JWT_SECRET: IxQm+Ew8bxKzs9TXn8U/sILSfJrUBrngc0E0qXyL8yK8K/2IRK3xrdfV3VlpWg74ymoH5Rovfi5WilAgY/hYvw==
+
     depends_on:
       auth-service-database:
           condition: service_healthy
@@ -100,6 +101,8 @@ services:
     build: ./api-gateway
     container_name: api-gateway
     restart: always
+    environment:
+      AUTH_SERVICE_URL: http://auth-service:4005
     ports:
       - "4004:4004"
     networks:
