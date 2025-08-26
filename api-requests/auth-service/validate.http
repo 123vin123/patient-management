@@ -1,2 +1,2 @@
-GET http://localhost:4004/auth/validate
+GET http://lb-c80b9bde.elb.localhost.localstack.cloud:4004/auth/validate
 Authorization: Bearer {{token}}
